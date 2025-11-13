@@ -29,7 +29,8 @@ defmodule CsvDiff.MixProject do
         "lib",
         "native/nativecsvdiff/Cargo.*",
         "native/nativecsvdiff/src",
-        "native/nativecsvdiff/.cargo",
+        ".cargo",
+        "Cargo.*",
         "checksum-*.exs",
         "mix.exs"
       ]
