@@ -25,5 +25,4 @@ csv_diff-*.tar
 # Rust binary artifacts
 /target/
 
-# Rust binary artifacts
-/target/
+*.so

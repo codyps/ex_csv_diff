@@ -22,7 +22,15 @@ defmodule CsvDiff.MixProject do
   defp package() do
     [
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/codyps/ex_csv_diff"}
+      links: %{"GitHub" => "https://github.com/codyps/ex_csv_diff"},
+      files: [
+        "lib",
+        "native/nativecsvdiff/Cargo.*",
+        "native/nativecsvdiff/src",
+        "native/nativecsvdiff/.cargo",
+        "checksum-*.exs",
+        "mix.exs"
+      ]
     ]
   end
 
@@ -34,9 +42,10 @@ defmodule CsvDiff.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.37.1", runtime: false},
+      {:rustler, "~> 0.37.1", runtime: false, optional: true},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:rustler_precompiled, "~> 0.8.3", runtime: false}
     ]
   end
 end
