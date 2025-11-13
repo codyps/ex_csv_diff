@@ -26,3 +26,5 @@ csv_diff-*.tar
 /target/
 
 *.so
+
+checksum-*.exs

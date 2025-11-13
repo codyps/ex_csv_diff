@@ -4,7 +4,7 @@ defmodule CsvDiff.MixProject do
   def project do
     [
       app: :csv_diff,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.18",
       source_url: "https://github.com/codyps/ex_csv_diff",
       homepage_url: "https://github.com/codyps/ex_csv_diff",
