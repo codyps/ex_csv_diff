@@ -1,13 +1,15 @@
 defmodule CsvDiff.MixProject do
   use Mix.Project
 
+  @version "0.2.0"
+  @source_url "https://github.com/codyps/ex_csv_diff"
   def project do
     [
       app: :csv_diff,
-      version: "0.2.0",
+      version: @version,
       elixir: "~> 1.18",
-      source_url: "https://github.com/codyps/ex_csv_diff",
-      homepage_url: "https://github.com/codyps/ex_csv_diff",
+      source_url: @source_url,
+      homepage_url: @source_url,
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
@@ -22,13 +24,12 @@ defmodule CsvDiff.MixProject do
   defp package() do
     [
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/codyps/ex_csv_diff"},
+      links: %{"GitHub" => @source_url},
       files: [
         "lib",
         "native/nativecsvdiff/Cargo.*",
         "native/nativecsvdiff/src",
-        "Cargo.*",
-        ".cargo",
+        "native/nativecsvdiff/.cargo",
         "checksum-*.exs",
         "mix.exs"
       ]
