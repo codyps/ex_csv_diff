@@ -1,11 +1,12 @@
 defmodule CsvDiff do
-
   @moduledoc """
-  Documentation for `CsvDiff`.
+  Provides an interface to the `csv-diff` Rust library, allowing for the diffing of CSV files.
   """
 
   @doc """
-  Hello world.
+  Diff two CSV strings and return a list of differences in structured form.
+
+  This corresponds to the `CsvByteDiffLocal` operation from the `csv-diff` Rust library.
 
   ## Examples
 
