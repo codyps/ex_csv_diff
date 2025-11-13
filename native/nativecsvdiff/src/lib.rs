@@ -1,10 +1,10 @@
 use csv_diff::diff_row::{ByteRecordLineInfo, DiffByteRecord};
 use csv_diff::{csv::Csv, csv_diff::CsvByteDiffLocal};
 
-use rustler::{NifResult, NifStruct, NifTaggedEnum};
+use rustler::{Binary, Env, NewBinary, NifResult, NifStruct, NifTaggedEnum};
 
 #[rustler::nif]
-pub fn diff(a: &str, b: &str) -> NifResult<Vec<NifDiffByteRecord>> {
+pub fn diff<'a>(env: Env<'a>, a: &str, b: &str) -> NifResult<Vec<NifDiffByteRecord<'a>>> {
     let csv_byte_diff = CsvByteDiffLocal::new().map_err(|e| {
         rustler::Error::Term(Box::new(format!("error_creating_csv_byte_diff: {}", e)))
     })?;
@@ -18,58 +18,64 @@ pub fn diff(a: &str, b: &str) -> NifResult<Vec<NifDiffByteRecord>> {
 
     Ok(diff_byte_records
         .into_iter()
-        .map(NifDiffByteRecord::from)
+        .map(|diff_byte_record| NifDiffByteRecord::new(env, diff_byte_record))
         .collect())
 }
 
 #[derive(NifTaggedEnum)]
-pub enum NifDiffByteRecord {
-    Add(NifByteRecordLineInfo),
+pub enum NifDiffByteRecord<'a> {
+    Add(NifByteRecordLineInfo<'a>),
     Modify {
-        delete: NifByteRecordLineInfo,
-        add: NifByteRecordLineInfo,
+        delete: NifByteRecordLineInfo<'a>,
+        add: NifByteRecordLineInfo<'a>,
         field_indices: Vec<usize>,
     },
-    Delete(NifByteRecordLineInfo),
+    Delete(NifByteRecordLineInfo<'a>),
 }
 
 #[derive(NifStruct)]
 #[module = "CsvDiff.ByteRecordLineInfo"]
-pub struct NifByteRecordLineInfo {
+pub struct NifByteRecordLineInfo<'a> {
     pub line: u64,
-    pub record: Vec<Vec<u8>>,
+    pub record: Vec<Binary<'a>>,
 }
 
-impl From<ByteRecordLineInfo> for NifByteRecordLineInfo {
-    fn from(byte_record_line_info: ByteRecordLineInfo) -> Self {
+fn binary_from_slice<'a>(env: Env<'a>, slice: &[u8]) -> Binary<'a> {
+    let mut binary = NewBinary::new(env, slice.len());
+    binary.as_mut_slice().copy_from_slice(slice);
+    binary.into()
+}
+
+impl<'a> NifByteRecordLineInfo<'a> {
+    fn new(env: Env<'a>, byte_record_line_info: ByteRecordLineInfo) -> Self {
         NifByteRecordLineInfo {
             line: byte_record_line_info.line(),
             record: byte_record_line_info
                 .into_byte_record()
                 .iter()
-                .map(|b| b.to_vec())
+                .map(|b| binary_from_slice(env, b))
                 .collect(),
         }
     }
 }
 
-impl From<DiffByteRecord> for NifDiffByteRecord {
-    fn from(diff_byte_record: DiffByteRecord) -> Self {
+impl<'a> NifDiffByteRecord<'a> {
+    fn new(env: Env<'a>, diff_byte_record: DiffByteRecord) -> Self {
         match diff_byte_record {
             DiffByteRecord::Add(byte_record_line_info) => {
-                NifDiffByteRecord::Add(byte_record_line_info.into())
+                NifDiffByteRecord::Add(NifByteRecordLineInfo::new(env, byte_record_line_info))
             }
             DiffByteRecord::Modify {
                 delete,
                 add,
                 field_indices,
             } => NifDiffByteRecord::Modify {
-                delete: delete.into(),
-                add: add.into(),
+                delete: NifByteRecordLineInfo::new(env, delete),
+                add: NifByteRecordLineInfo::new(env, add),
                 field_indices,
             },
             DiffByteRecord::Delete(byte_record_line_info) => {
-                NifDiffByteRecord::Delete(byte_record_line_info.into())
+                NifDiffByteRecord::Delete(NifByteRecordLineInfo::new(env, byte_record_line_info))
             }
         }
     }
