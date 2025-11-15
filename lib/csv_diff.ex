@@ -5,7 +5,7 @@ defmodule CsvDiff do
 
   alias CsvDiff.ByteRecordLineInfo
 
-  @type diff {:modify, %{delete: %ByteRecordLineInfo{}, add: %ByteRecordLineInfo{}, field_indices: [non_neg_integer()]}} |
+  @type diff() :: {:modify, %{delete: %ByteRecordLineInfo{}, add: %ByteRecordLineInfo{}, field_indices: [non_neg_integer()]}} |
              {:add, %ByteRecordLineInfo{}} |
              {:delete, %ByteRecordLineInfo{}}
 
