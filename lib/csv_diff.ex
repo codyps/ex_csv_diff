@@ -3,8 +3,15 @@ defmodule CsvDiff do
   Provides an interface to the `csv-diff` Rust library, allowing for the diffing of CSV files.
   """
 
+  alias CsvDiff.ByteRecordLineInfo
+
+  @type diff {:modify, %{delete: %ByteRecordLineInfo{}, add: %ByteRecordLineInfo{}, field_indices: [non_neg_integer()]}} |
+             {:add, %ByteRecordLineInfo{}} |
+             {:delete, %ByteRecordLineInfo{}}
+
+
   @doc """
-  Diff two CSV strings and return a list of differences in structured form.
+  Diff two CSVs and return a list of differences in structured form.
 
   This corresponds to the `CsvByteDiffLocal` operation from the `csv-diff` Rust library.
 
@@ -23,6 +30,7 @@ defmodule CsvDiff do
       ]
 
   """
+  @spec diff(binary(), binary()) :: [diff()]
   def diff(a, b) do
     CsvDiff.Native.diff(a, b)
   end
